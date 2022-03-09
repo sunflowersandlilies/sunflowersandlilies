@@ -1,4 +1,4 @@
-### Hi there 👋
+### ML Project - Stage 2
 
 <!--
 **sunflowersandlilies/sunflowersandlilies** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
