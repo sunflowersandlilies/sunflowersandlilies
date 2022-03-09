@@ -1,0 +1,83 @@
+#Importing the required libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt 
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn import tree
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
+from sklearn.model_selection import GridSearchCV
+ 
+#Reading the data set
+df = pd.read_csv('winequality-red.csv')
+df.shape
+df.head()
+
+#Selecting only values that are not equal to 0 and The Data Visualization
+df.isnull().sum()    
+#The plot portrays the number of values for each grade for the quality
+qualityscores = df['quality'].value_counts()
+plt.bar(qualityscores.index, qualityscores)
+plt.xlabel('quality')
+plt.ylabel('quantity')
+plt.show()
+
+#Calculating the mean and the median of the quality scores
+a = np.median(df['quality'])
+print (a)
+b = np.mean(df['quality'])
+print(b)
+df['quality'].describe()
+
+#Preprocessing the data/Binarization of the label
+X = df.drop('quality', axis=1)
+X.head()
+df["wine"] = [1 if i > 6 else 0 for i in df["quality"]]
+y = df["wine"]
+y.value_counts()
+
+#Understanding the correlation between the features
+correlation = df.corr()
+matplotlib.pyplot.subplots(figsize=(15,10))
+sns.heatmap(corr, xticklabels=correlation.columns, yticklabels=correlation.columns, annot=True, cmap=sns.diverging_palette(220, 20, as_cmap=True))
+
+#Splitting the Data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=2020, stratify=y)
+print("Shape of X_train data: ", X_train.shape)
+print("Shape of X_test data: ", X_test.shape)
+
+#DecisionTree Modeling
+model = DecisionTreeClassifier(random_state=2020)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy: ", accuracy)
+print(classification_report(y_test, y_pred))
+tree.plot_tree(model)
+
+#Checking for overfitting
+y_pred_train = model.predict(X_train)
+tr_accuracy = accuracy_score(y_train, y_pred_train)
+print("Training Accuracy: ", tr_accuracy)
+
+#GridSearchCV
+newparameters = {"max_depth": range(1,6), "max_features": range(1,10), "criterion": ["gini", "entropy"]}
+decisiontree_cv = GridSearchCV(model, newparameters, cv=5)
+decisiontree_cv.fit(X_train,y_train)
+print(decisiontree_cv.best_params_)
+
+#The New DecisionTree model 
+new_model = DecisionTreeClassifier(criterion = “gini”, max_depth=2, max_features=9, random_state=2020)
+new_model.fit(X_train, y_train)
+y_pred_new = model.predict(X_test)
+accuracy_new = accuracy_score( y_test, y_pred_new)
+print("Accuracy: ", accuracy_new)
+
+#Visualizing New Decision Tree
+fn=['fixed acidity ','volatile acidity','citric acid','residual sugar','chlorides','free sulfur dioxide','total sulfur dioxide','density','pH','sulphates','alcohol']
+fig, axes = plt.subplots(nrows = 1,ncols = 1,figsize = (2,2), dpi=300)
+tree.plot_tree(new_model, feature_names = fn, filled = True)
+
+
