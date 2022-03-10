@@ -44,17 +44,17 @@ matplotlib.pyplot.subplots(figsize=(15,10))
 sns.heatmap(corr, xticklabels=correlation.columns, yticklabels=correlation.columns, annot=True, cmap=sns.diverging_palette(220, 20, as_cmap=True))
 
 #Splitting the Data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=2020, stratify=y)
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2020, stratify=y)
 print("Shape of X_train data: ", X_train.shape)
 print("Shape of X_test data: ", X_test.shape)
 
 #DecisionTree Modeling
 model = DecisionTreeClassifier(random_state=2020)
 model.fit(X_train, y_train)
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
+y_pred = model.predict(X_val)
+accuracy = accuracy_score(y_val, y_pred)
 print("Accuracy: ", accuracy)
-print(classification_report(y_test, y_pred))
+print(classification_report(y_val, y_pred))
 tree.plot_tree(model)
 
 #Checking for overfitting
@@ -71,8 +71,8 @@ print(decisiontree_cv.best_params_)
 #The New DecisionTree model 
 new_model = DecisionTreeClassifier(criterion = “gini”, max_depth=2, max_features=9, random_state=2020)
 new_model.fit(X_train, y_train)
-y_pred_new = model.predict(X_test)
-accuracy_new = accuracy_score( y_test, y_pred_new)
+y_pred_new = model.predict(X_val)
+accuracy_new = accuracy_score( y_val, y_pred_new)
 print("Accuracy: ", accuracy_new)
 
 #Visualizing New Decision Tree
