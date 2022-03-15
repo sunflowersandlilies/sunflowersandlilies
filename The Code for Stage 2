@@ -44,7 +44,7 @@ matplotlib.pyplot.subplots(figsize=(15,10))
 sns.heatmap(corr, xticklabels=correlation.columns, yticklabels=correlation.columns, annot=True, cmap=sns.diverging_palette(220, 20, as_cmap=True))
 
 #Splitting the Data
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2020, stratify=y)
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2020)
 print("Shape of X_train data: ", X_train.shape)
 print("Shape of X_val data: ", X_val.shape)
 
