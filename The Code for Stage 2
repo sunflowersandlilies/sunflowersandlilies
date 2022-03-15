@@ -7,7 +7,6 @@ from sklearn.model_selection import train_test_split
 from sklearn import tree
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
-from sklearn.metrics import classification_report
 from sklearn.model_selection import GridSearchCV
  
 #Reading the data set
@@ -54,7 +53,6 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_val)
 accuracy = accuracy_score(y_val, y_pred)
 print("Accuracy: ", accuracy)
-print(classification_report(y_val, y_pred))
 tree.plot_tree(model)
 
 #Checking for overfitting
