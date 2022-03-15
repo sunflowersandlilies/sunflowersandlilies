@@ -16,6 +16,7 @@ df.head()
 
 #Selecting only values that are not equal to 0 and The Data Visualization
 df.isnull().sum()    
+
 #The plot portrays the number of values for each grade for the quality
 qualityscores = df['quality'].value_counts()
 plt.bar(qualityscores.index, qualityscores)
@@ -40,7 +41,7 @@ y.value_counts()
 #Understanding the correlation between the features
 correlation = df.corr()
 matplotlib.pyplot.subplots(figsize=(15,10))
-sns.heatmap(corr, xticklabels=correlation.columns, yticklabels=correlation.columns, annot=True, cmap=sns.diverging_palette(220, 20, as_cmap=True))
+sns.heatmap(correlation, annot=True, cmap=sns.diverging_palette(220, 20, as_cmap=True))
 
 #Splitting the Data
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2020)
