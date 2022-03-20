@@ -14,7 +14,7 @@ df = pd.read_csv('winequality-red.csv')
 df.shape
 df.head()
 
-#Selecting only values that are not equal to 0 and The Data Visualization
+#Selecting only values that are not equal to 0
 df.isnull().sum()    
 
 #The plot portrays the number of values for each grade for the quality
