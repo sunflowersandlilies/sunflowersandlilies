@@ -6,8 +6,11 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn import tree
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.linear_model import LogisticRegression
+from sklearn import metrics
+from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import GridSearchCV
+from sklearn.preprocessing import StandardScaler
  
 #Reading the data set
 df = pd.read_csv('winequality-red.csv')
@@ -40,43 +43,94 @@ y.value_counts()
 
 #Understanding the correlation between the features
 correlation = df.corr()
-matplotlib.pyplot.subplots(figsize=(15,10))
+plt.subplots(figsize=(15,10))
 sns.heatmap(correlation, annot=True, cmap=sns.diverging_palette(220, 20, as_cmap=True))
 
 #Splitting the Data
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2020)
-print("Shape of X_train data: ", X_train.shape)
-print("Shape of X_val data: ", X_val.shape)
+X_train, X_rem, y_train, y_rem = train_test_split(X, y, train_size=0.6)
+X_val, X_test, y_val, y_test=train_test_split(X_rem, y_rem, test_size=0.5)
+print(X_train.shape), print(y_train.shape) 
+print(X_val.shape), print(y_val.shape) 
+print(X_test.shape), print(y_test.shape)
+
 
 #DecisionTree Modeling
-model = DecisionTreeClassifier(random_state=2020)
-model.fit(X_train, y_train)
-y_pred = model.predict(X_val)
-accuracy = accuracy_score(y_val, y_pred)
+clf = DecisionTreeClassifier()
+clf.fit(X_train, y_train)
+y_pred = clf.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy: ", accuracy)
-tree.plot_tree(model)
+tree.plot_tree(clf)
 
 #Checking for overfitting
-y_pred_train = model.predict(X_train)
+y_pred_train = clf.predict(X_train)
 tr_accuracy = accuracy_score(y_train, y_pred_train)
 print("Training Accuracy: ", tr_accuracy)
 
-#GridSearchCV
+#Pruning the Hypermeters
 newparameters = {"max_depth": range(1,6), "max_features": range(1,10), "criterion": ["gini", "entropy"]}
 decisiontree_cv = GridSearchCV(model, newparameters, cv=5)
 decisiontree_cv.fit(X_train,y_train)
 print(decisiontree_cv.best_params_)
 
 #The New DecisionTree model 
-new_model = DecisionTreeClassifier(criterion = “gini”, max_depth=2, max_features=8, random_state=2020)
-new_model.fit(X_train, y_train)
-y_pred_new = model.predict(X_val)
-accuracy_new = accuracy_score( y_val, y_pred_new)
+clf2 = DecisionTreeClassifier(criterion = "gini", max_depth=2, max_features=8)
+clf2.fit(X_train, y_train)
+y_pred_new = clf2.predict(X_test)
+accuracy_new = accuracy_score(y_test, y_pred_new)
 print("Accuracy: ", accuracy_new)
+
+#Calculating the Error Rate
+error_rate = 1-(accuracy_new)
+print("Error rate of Decision Tree Classifier Model: ", error_rate)
+
+#Printing the Confusion Matric
+conf_mat = confusion_matrix(y_test, y_pred)
+ax= plt.subplot()
+sns.heatmap(conf_mat, annot=True, fmt='g', ax=ax)
+ax.set_xlabel('Predicted labels',fontsize=15)
+ax.set_ylabel('True labels',fontsize=15)
+ax.set_title('Confusion Matrix',fontsize=15)
+ax.xaxis.set_ticklabels(['below zero', 'above zero'],fontsize=15)
+ax.yaxis.set_ticklabels(['below zero', 'above zero'],fontsize=15)
+
+#Printing the F1-score
+print(classification_report( y_pred, y_test))
 
 #Visualizing New Decision Tree
 fn=['fixed acidity ','volatile acidity','citric acid','residual sugar','chlorides','free sulfur dioxide','total sulfur dioxide','density','pH','sulphates','alcohol']
 fig, axes = plt.subplots(nrows = 1,ncols = 1,figsize = (2,2), dpi=300)
 tree.plot_tree(new_model, feature_names = fn, filled = True)
 
+##The Second Method##
 
+#Standardizing the Features
+scaler = StandardScaler()
+scaled_X = scaler.fit_transform(X)
+
+#Splitting the Data
+X_train, X_rem, y_train, y_rem = train_test_split(scaled_X, y, test_size=0.6)
+X_val, X_test, y_val, y_test=train_test_split(X_rem, y_rem, test_size=0.5)
+
+#Logistic Regression
+lr_clf=LogisticRegression()
+lr_clf.fit(X_train, y_train)
+y_pred =lr_clf.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+
+#Printing the Confusion Matric
+conf_mat = confusion_matrix(y_test, y_pred)
+ax= plt.subplot()
+sns.heatmap(conf_mat, annot=True, fmt='g', ax=ax)
+ax.set_xlabel('Predicted labels',fontsize=15)
+ax.set_ylabel('True labels',fontsize=15)
+ax.set_title('Confusion Matrix',fontsize=15)
+ax.xaxis.set_ticklabels(['below zero', 'above zero'],fontsize=15)
+ax.yaxis.set_ticklabels(['below zero', 'above zero'],fontsize=15)
+
+#Printing the F1-score
+print(classification_report( y_pred, y_test))
+
+#Calculating the Error Rate
+error_rate = 1-(accuracy)
+print("Error rate of Logistic Regression Model: ", error_rate)
